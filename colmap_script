@@ -1,0 +1,15 @@
+#!/bin/bash -l
+
+#$ -P [SET_YOUR_PROJECT_NAME]
+#$ -l h_rt=8:00:00
+#$ -m ea
+#$ -N colmap
+#$ -j y
+#$ -o colmap.logs
+#$ -pe omp 32
+#$ -l gpus=1
+#$ -l gpu_c=3.5
+
+module load miniconda
+conda activate venv
+python convert.py -s ./dataset/YOUR_DATASET/

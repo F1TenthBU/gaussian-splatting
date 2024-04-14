@@ -1,0 +1,18 @@
+#!/bin/bash -l
+
+#$ -P [YOUR_SCC_PROJECT]
+#$ -l h_rt=4:00:00
+#$ -m ea
+#$ -N splatting
+#$ -j y
+#$ -o splatting.logs
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=6.0
+#$ -l gpu_memory=24G
+
+module load miniconda/23.11.0
+module load cuda/11.8
+conda activate venv
+
+python train.py -s ./dataset/your_dataset --model_path ./output/your_dataset --iterations 60000 --test_iterations 1000 7000 30000 45000 60000 --save_iterations 1000 7000 30000 45000 60000
