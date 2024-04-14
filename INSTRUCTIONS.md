@@ -50,7 +50,7 @@ envs_dirs:
 17. mkdir $WRK_DIR/gaussian-splatting/datasets
 
 # Now upload to the datasets a subfolder with the training images.
-18. [Upload to $WRK_DIR/gaussian-splatting/datasets/your_dataset training data. The images should be in $WRK_DIR/gaussian-splatting/datasets/your_dataset/input and should be numbered.]
+18. [Upload to $WRK_DIR/gaussian-splatting/datasets/your_dataset training data. The images should be in $WRK_DIR/gaussian-splatting/datasets/your_dataset/input and should be numbered. Also make sure the images are not blurry. To achieve this, consider using https://github.com/F1TenthBU/Video2Image4Colmap which attempts to convert a video stream to images using the least blurry frames. Ofcourse the input video itself still should be of as high quality as possible capturing multiple angles of the same location, avoids capturing just plain objects like a blank white wall, and has minimal motion blur.]
 
 19. Modify `$WRK_DIR/gaussian-splatting/colmap_script` to fit your needs. This script runs the convert.py file which runs colmap. Here are some things to keep in mind:
 * In the `-P` flag you must set the SCC project to use for the job queue. For example if you have access to the SCC through CS454 and thus you have access to /projectnb/cs454/, in the `-P` flag, you would put CS454.
