@@ -61,7 +61,9 @@ envs_dirs:
 # When ready, submit the job using the following command
 20. `qsub $WRK_DIR/gaussian-splatting/colmap_script`
 
-21. Next, we need to modify `$WRK_DIR/gaussian-splatting/splatting_script` to fit your needs. This script runs train.py which runs the actual gaussian splatting training. Here are some things to keep in mind:
+    * Note: This must be done in the `gaussian-splatting` directory.
+
+22. Next, we need to modify `$WRK_DIR/gaussian-splatting/splatting_script` to fit your needs. This script runs train.py which runs the actual gaussian splatting training. Here are some things to keep in mind:
 * Gaussian splatting requires 24G+ VRam to train. So avoid changing the `-l gpu_memory=24G` option unless you know what you are doing.
 * `-l h_rt=` is the hard max limit for the job runtime. If training takes longer than this, it will be killed.
 * See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
