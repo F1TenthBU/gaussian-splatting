@@ -66,3 +66,11 @@ envs_dirs:
 * `-l h_rt=` is the hard max limit for the job runtime. If training takes longer than this, it will be killed.
 * See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
 * Make sure to look at https://github.com/F1TenthBU/gaussian-splatting/ for further params you can pass to the train.py script
+
+# Track current job & check output log
+
+22. Use `qstat -u <your_scc_username>` to keep track of the submitted job
+
+* If state is `qw`, then current job is queued. If state is `r`, then current job is running.
+* After the job started, see the output log by `cat colmap.logs`.
+
