@@ -1,28 +1,39 @@
-# In order to get everything to build and setup, first we need a GPU. Otherwise, some of the pip installations will fail.
-# We don't need a very powerful GPU for this step so in order to reduce queue time, we'll request any GPU
-# This, the below command requests 1 GPU with cuda capability above 3.5 (lower) for at most 3 hours with 1 CPU and queue timeouts disabled
-1. `qrsh -l gpus=1 -l gpu_c=3.5 -l h_rt=3:00:00 -pe omp 1 -now n`
+# Requirements
+- In order to get everything to build and setup, first we need a GPU. Otherwise, some of the pip installations will fail.
+- We don't need a very powerful GPU for this step so in order to reduce queue time, we'll request any GPU.
+- This, the below command requests 1 GPU with cuda capability above 3.5 (lower) for at most 3 hours with 1 CPU and queue timeouts disabled. Please modify hours required (`h_rt`) base on your training estimation.
+  
+   `qrsh -l gpus=1 -l gpu_c=3.5 -l h_rt=3:00:00 -pe omp 1 -now n`
 
-# Next lets load all the modules wel'll need in.
-2. `module load ninja`
-3. `module load miniconda`
-4. `module load cuda/11.8`
-# (These steps are only to load ImageMagick and its submodules which is only needed if resizing images)
-5. `module load fftw/3.3.4`
-6. `module load tiff/4.0.6`
-7. `module load openjpeg/2.1.2`
-8. `module load imagemagick`
+  
+# Load Required Modules
+- `module load ninja`
+- `module load miniconda`
+- `module load cuda/11.8`
+  
+# Load Optional Modules
 
-# Lets now setup our conda environment
-# First we need a directory in projectnb to work in. Our home directory is limited to just 10 GB so that won't do.
-# From here onwards, path inside this projectnb directory will be referred to as "$WRK_DIR"
-# Might as well just export a env variable to make like easier.
-9. `export WRK_DIR=/projectnb/path/that/you/figure/out`
+(These steps are only to load ImageMagick and its submodules which is only needed if resizing images)
+-  `module load fftw/3.3.4`
+-  `module load tiff/4.0.6`
+-  `module load openjpeg/2.1.2`
+-  `module load imagemagick`
 
-# By default, when you install conda packages, they land in ~/.conda. This won't do due to the 10 GB cap. So, we need to relocate our conda directory using a special file called the .condarc file.
-10. `mkdir $WRK_DIR/.conda $WRK_DIR/.conda/pkgs $WRK_DIR/.conda/envs`
-11. `nano ~/.condarc` or `vim ~/.condarc`
-12. Paste in the following text (modifying the $WRK_DIR ofcourse):
+# Setup Conda Environment
+## Find Suitable working Directory
+- We need a directory in **projectnb** to work in. Our home directory is limited to just *10 GB* so that won't do.
+- From here onwards, path inside this projectnb directory will be referred to as `$WRK_DIR`
+- Export the environment variable to make it easier:
+
+  `export WRK_DIR=/projectnb/path/that/you/figure/out`
+
+## Install Conda Packages
+### Relocate Conda Directory
+By default, when you install conda packages, they land in `~/.conda`. This won't do due to the 10 GB cap. So, we need to relocate our conda directory using a special file called the .condarc file.
+- `mkdir $WRK_DIR/.conda $WRK_DIR/.conda/pkgs $WRK_DIR/.conda/envs`
+- `nano ~/.condarc` or `vim ~/.condarc`
+
+Paste in the following text (modifying the `$WRK_DIR`):
 ```
 pkgs_dirs:
   - /projectnb/cs585/aseef/.conda/pkgs
@@ -30,26 +41,34 @@ envs_dirs:
   - /projectnb/cs585/aseef/.conda/envs
 ```
 
-# Clone the our fork of the gaussing splatting repo from with in $WRK_DIR
-# The recursive clonning will also clone subprojects used including: https://gitlab.inria.fr/sibr/sibr_core, https://github.com/graphdeco-inria/diff-gaussian-rasterization, https://gitlab.inria.fr/bkerbl/simple-knn, https://github.com/g-truc/glm
-13. `git clone --recursive https://github.com/F1TenthBU/gaussian-splatting.git`
+### Clone Gaussing Splatting Repo
+- Clone the our fork of the gaussing splatting repo from with in `$WRK_DIR`
+- The recursive clonning will also clone subprojects used including: [SIBR Core](https://gitlab.inria.fr/sibr/sibr_core), [diff-gaussian-rasterization](https://github.com/graphdeco-inria/diff-gaussian-rasterization), [simple-knn](https://gitlab.inria.fr/bkerbl/simple-knn), [glm
+](https://github.com/g-truc/glm)
 
-# Create your initial conda enviornment with cuda, torch, and colmap installed. On the SCC, higher cuda versions do not seem work.
-# One you run this command, enter 'y' to confirm creating the environment.
-# Once finished, this should have created a conda environment in $WRK_DIR/.conda/envs and NOT ~/.conda/envs.
-14. `conda create --name venv python=3.8 colmap=3.8 pytorch==2.2.1 torchvision==0.17.1 torchaudio==2.2.1 pytorch-cuda=11.8 cudatoolkit=11.8 -c pytorch -c nvidia -c conda-forge`
+  `git clone --recursive https://github.com/F1TenthBU/gaussian-splatting.git`
 
-# Activate the conda environment you created
-15. `conda activate venv`
+### Create your initial conda enviornment with cuda, torch, and colmap installed. 
+  `conda create --name venv python=3.8 colmap=3.8 pytorch==2.2.1 torchvision==0.17.1 torchaudio==2.2.1 pytorch-cuda=11.8 cudatoolkit=11.8 -c pytorch -c nvidia -c conda-forge`
 
-# We aren't done just yet! From inside the conda environment, we need to pip install a few more things!
-16. `pip install plyfile tqdm $WRK_DIR/gaussian-splatting/submodules/simple-knn $WRK_DIR/gaussian-splatting/submodules/diff-gaussian-rasterization`
+- On the SCC, higher cuda versions do not seem work.
+- One you run this command, enter 'y' to confirm creating the environment.
+- Once finished, this should have created a conda environment in $WRK_DIR/.conda/envs and NOT ~/.conda/envs.
+ 
+
+### Activate Conda Environment
+  `conda activate venv`
+
+### Pip Modules Installation
+We aren't done just yet! From inside the conda environment, we need to pip install a few more things!
+
+   `pip install plyfile tqdm $WRK_DIR/gaussian-splatting/submodules/simple-knn $WRK_DIR/gaussian-splatting/submodules/diff-gaussian-rasterization`
 
 # Assuming, everything worked, we are now almost ready to train!
-# First, lets create a datasets folder to put all the training images in.
-17. mkdir $WRK_DIR/gaussian-splatting/datasets
+# Create a datasets folder to put all the training images in.
+  `mkdir $WRK_DIR/gaussian-splatting/datasets`
 
-# Now upload to the datasets a subfolder with the training images.
+# Upload to the datasets a subfolder with the training images.
 18. [Upload to $WRK_DIR/gaussian-splatting/datasets/your_dataset training data. The images should be in $WRK_DIR/gaussian-splatting/datasets/your_dataset/input and should be numbered. Also make sure the images are not blurry. To achieve this, consider using https://github.com/F1TenthBU/Video2Image4Colmap which attempts to convert a video stream to images using the least blurry frames. Ofcourse the input video itself still should be of as high quality as possible capturing multiple angles of the same location, avoids capturing just plain objects like a blank white wall, and has minimal motion blur.]
 
 19. Modify `$WRK_DIR/gaussian-splatting/colmap_script` to fit your needs. This script runs the convert.py file which runs colmap. Here are some things to keep in mind:
