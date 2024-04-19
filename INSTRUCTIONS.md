@@ -68,30 +68,82 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
 # Create a datasets folder to put all the training images in.
   `mkdir $WRK_DIR/gaussian-splatting/datasets`
 
-# Upload to the datasets a subfolder with the training images.
-18. [Upload to $WRK_DIR/gaussian-splatting/datasets/your_dataset training data. The images should be in $WRK_DIR/gaussian-splatting/datasets/your_dataset/input and should be numbered. Also make sure the images are not blurry. To achieve this, consider using https://github.com/F1TenthBU/Video2Image4Colmap which attempts to convert a video stream to images using the least blurry frames. Ofcourse the input video itself still should be of as high quality as possible capturing multiple angles of the same location, avoids capturing just plain objects like a blank white wall, and has minimal motion blur.]
+# Upload to the dataset a subfolder with the training images.
+- Upload to `$WRK_DIR/gaussian-splatting/dataset/[your_dataset]` training data.
+- The images should be in `$WRK_DIR/gaussian-splatting/dataset/[your_dataset]/input` and should be numbered.
+- Structure of foldering:
+  ```
+   ---gaussian-splatting
+    |---dataset
+    |  |---[your_dataset]
+    |    |---input
+    |---colmap_script
+    |---splatting_script
+  ```
+- Also make sure the images are not blurry. To achieve this, consider using https://github.com/F1TenthBU/Video2Image4Colmap which attempts to convert a video stream to images using the least blurry frames. Ofcourse the input video itself still should be of as high quality as possible capturing multiple angles of the same location, avoids capturing just plain objects like a blank white wall, and has minimal motion blur.
 
-19. Modify `$WRK_DIR/gaussian-splatting/colmap_script` to fit your needs. This script runs the convert.py file which runs colmap. Here are some things to keep in mind:
-* In the `-P` flag you must set the SCC project to use for the job queue. For example if you have access to the SCC through CS454 and thus you have access to /projectnb/cs454/, in the `-P` flag, you would put CS454.
-* `-l h_rt=` is the hard max limit for the job runtime. If colmap takes longer than this, it will be killed.
-* See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
-* Make sure to look at https://github.com/F1TenthBU/gaussian-splatting/ for further params you can pass to the convert.py script
+# Modify `colmap_script` 
+- Modify `$WRK_DIR/gaussian-splatting/colmap_script` to fit your needs. This script runs the `convert.py` file which runs colmap. Here are some things to keep in mind:
+  -  In the `-P` flag you must set the SCC project to use for the job queue. For example if you have access to the SCC through CS454 and thus you have access to `/projectnb/cs454/`, in the `-P` flag, you would put CS454.
+  -   `-l h_rt=` is the hard max limit for the job runtime. If colmap takes longer than this, it will be killed.
+  -   See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
+  -   Make sure to look at https://github.com/F1TenthBU/gaussian-splatting/ for further params you can pass to the convert.py script
+-   Sample colmap_script based on the above structure
+  ```shell
+  #!/bin/bash -l
 
-# When ready, submit the job using the following command
-20. `qsub $WRK_DIR/gaussian-splatting/colmap_script`
+  #$ -P [to be replaced by your won project folder name]
+  #$ -l h_rt=8:00:00
+  #$ -m ea
+  #$ -N colmap
+  #$ -j y
+  #$ -o colmap.logs
+  #$ -pe omp 32
+  #$ -l gpus=1
+  #$ -l gpu_c=3.5
+  
+  module load miniconda
+  conda activate venv
+  python convert.py -s ./dataset/[your_dataset]/
+  ```
 
-    * Note: This must be done in the `gaussian-splatting` directory.
+# Submit colmap job
+  `qsub $WRK_DIR/gaussian-splatting/colmap_script` or `qsub ./colmap_script` in `gaussian-splatting` directory.
 
-22. Next, we need to modify `$WRK_DIR/gaussian-splatting/splatting_script` to fit your needs. This script runs train.py which runs the actual gaussian splatting training. Here are some things to keep in mind:
-* Gaussian splatting requires 24G+ VRam to train. So avoid changing the `-l gpu_memory=24G` option unless you know what you are doing.
-* `-l h_rt=` is the hard max limit for the job runtime. If training takes longer than this, it will be killed.
-* See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
-* Make sure to look at https://github.com/F1TenthBU/gaussian-splatting/ for further params you can pass to the train.py script
+# Check colmap job output
+- After colmap finish running, check output by doing `cat colmap.logs`
+  
+# Modify `splatting_script` 
+- Now, we need to modify `$WRK_DIR/gaussian-splatting/splatting_script` to fit your needs. This script runs `train.py` which runs the actual gaussian splatting training. Here are some things to keep in mind:
+  - Gaussian splatting requires 24G+ VRam to train. So avoid changing the `-l gpu_memory=24G` option unless you know what you are doing.
+  - `-l h_rt=` is the hard max limit for the job runtime. If training takes longer than this, it will be killed.
+  - See https://www.bu.edu/tech/support/research/system-usage/running-jobs/submitting-jobs/#job-options for all job options
+  - Make sure to look at https://github.com/F1TenthBU/gaussian-splatting/ for further params you can pass to the train.py script
 
-# Track current job & check output log
+- Sample splatting_script based on the above structure
+  ```shell
+  #!/bin/bash -l
 
-22. Use `qstat -u <your_scc_username>` to keep track of the submitted job
+  #$ -P [to be replaced by your won project folder name]
+  #$ -l h_rt=4:00:00
+  #$ -m ea
+  #$ -N splatting
+  #$ -j y
+  #$ -o splatting.logs
+  #$ -pe omp 8
+  #$ -l gpus=1
+  #$ -l gpu_c=6.0
+  #$ -l gpu_memory=24G
+  
+  module load miniconda/23.11.0
+  module load cuda/11.8
+  conda activate venv
+  
+  python train.py -s ./dataset/[your_dataset] --model_path ./output/[your_own_folder_name] --iterations 60000 --test_iterations 1000 7000 30000 45000 60000 --save_iterations 1000 7000 30000 45000 60000
+  ```
+# Submit splatting job
+  `qsub $WRK_DIR/gaussian-splatting/splatting_script` or `qsub ./splatting_script` in `gaussian-splatting` directory.
 
-* If state is `qw`, then current job is queued. If state is `r`, then current job is running.
-* After the job started, see the output log by `cat colmap.logs`.
-
+# Track current job
+- Use `qstat -u <your_scc_username>` to keep track of the submitted job
+  - If state is `qw`, then current job is queued. If state is `r`, then current job is running.
