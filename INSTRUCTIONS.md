@@ -144,6 +144,9 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
 # Submit splatting job
   `qsub $WRK_DIR/gaussian-splatting/splatting_script` or `qsub ./splatting_script` in `gaussian-splatting` directory.
 
+# Visualize splatting results
+- In `$WRK_DIR/gaussian-splatting/output/[your_own_folder_name]/point_cloud/iteration_[iteration_number]`, use the polygon file (`.ply`) for visualization on [WebGL 3D Gaussian Splat Viewer](https://antimatter15.com/splat/).
+
 # Track current job
 - Use `qstat -u <your_scc_username>` to keep track of the submitted job
   - If state is `qw`, then current job is queued. If state is `r`, then current job is running.
