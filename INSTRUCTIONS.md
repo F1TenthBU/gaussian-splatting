@@ -111,7 +111,42 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
   `qsub $WRK_DIR/gaussian-splatting/colmap_script` or `qsub ./colmap_script` in `gaussian-splatting` directory.
 
 # Check colmap job output
-- After colmap finish running, check output by doing `cat colmap.logs`
+- After colmap finish running, check output by doing `cat colmap.logs` to make sure everything ran smoothly.
+- You should also head on over to `$WRK_DIR/gaussian-splatting//dataset/[your_dataset]` to check out the output of colmap. You should have a directory layout that looks like this:
+```
+<location>
+|---<run-colmap-photometric.sh>
+|---<run-colmap-geometric.sh>
+|---<database.db-wal>
+|---<database.db-shm>
+|---<database.db>
+|---stereo
+    |---<patch-match.cfg>
+    |---<fusion.cfg>
+    |---normal_maps
+    |---depth_maps
+    |---consistency_graphs
+|---input
+    |---<image 0>
+    |---<image 1>
+    |---...
+|---images
+    |---<image 0>
+    |---<image 1>
+    |---...
+|---sparse
+    |---0
+        |---cameras.bin
+        |---images.bin
+        |---points3D.bin
+|---distorted
+    |---sparse
+        |---0
+            |---cameras.bin
+            |---images.bin
+            |---points3D.bin
+```
+We are most interested in the `distorted` directory. Take a look in there to make sure `./distorted/sparse` has a directory called `0`. You may also want to visualize the colmap output on your local computer by downloading the output directory or directories in `./distorted/sparse/`. Note that it is possible to have other directories numbered `1`, `2`, and so on. Each directory here represents a set of points that colmap discovered are related to another. However, if you end up with more than one directory (i.e. a directory other than just `0`) *especially* if they contain files of similar sizes, it indicates colormap discovered 2 or more trees of related points but could not figure out how those sets of points relate with each other (in terms of their relative location). This indicates an issue with the original input video and may be a problem if the relevant trees of points are large.
   
 # Modify `splatting_script` 
 - Now, we need to modify `$WRK_DIR/gaussian-splatting/splatting_script` to fit your needs. This script runs `train.py` which runs the actual gaussian splatting training. Here are some things to keep in mind:
