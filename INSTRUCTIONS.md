@@ -124,6 +124,15 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
 # Submit colmap job
   `qsub $WRK_DIR/gaussian-splatting/colmap_script` or `qsub ./colmap_script` in `gaussian-splatting` directory.
 
+  - If encountered error  like this
+    ```shell
+    qt.qpa.xcb: could not connect to display
+    qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+    This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+    ```
+
+    Update this line in colmap_script: `python convert.py --no_gpu -s ./dataset/[your_dataset]/`
+
 # Check colmap job output
 - After colmap finish running, check output by doing `cat colmap.logs` to make sure everything ran smoothly.
 - You should also head on over to `$WRK_DIR/gaussian-splatting//dataset/[your_dataset]` to check out the output of colmap. You should have a directory layout that looks like this:
