@@ -80,7 +80,7 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
   
 # Assuming, everything worked, we are now almost ready to train!
 # Create a datasets folder to put all the training images in.
-  `mkdir $WRK_DIR/gaussian-splatting/datasets`
+  `mkdir $WRK_DIR/gaussian-splatting/dataset`
 
 # Upload to the dataset a subfolder with the training images.
 - Upload to `$WRK_DIR/gaussian-splatting/dataset/[your_dataset]` training data.
