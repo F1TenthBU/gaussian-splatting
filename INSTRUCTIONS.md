@@ -64,6 +64,20 @@ We aren't done just yet! From inside the conda environment, we need to pip insta
 
    `pip install plyfile tqdm $WRK_DIR/gaussian-splatting/submodules/simple-knn $WRK_DIR/gaussian-splatting/submodules/diff-gaussian-rasterization`
 
+- If running into error like this:
+  
+  ```shell
+  File "/projectnb/ec504bk/students/alinajw/.conda/envs/Gaussians4D/lib/python3.7/site-packages/torch/utils/cpp_extension.py", line 1780, in _get_cuda_arch_flags
+        arch_list[-1] += '+PTX'
+    IndexError: list index out of range
+  ```
+
+  Run the following command to manually Set CUDA Architecture Flags, and then rerun pip install.
+
+  ```shell
+  export TORCH_CUDA_ARCH_LIST="6.0;7.5;8.0"
+  ```
+  
 # Assuming, everything worked, we are now almost ready to train!
 # Create a datasets folder to put all the training images in.
   `mkdir $WRK_DIR/gaussian-splatting/datasets`
