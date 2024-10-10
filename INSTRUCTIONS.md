@@ -5,7 +5,6 @@
   
    `qrsh -l gpus=1 -l gpu_c=3.5 -l h_rt=3:00:00 -pe omp 1 -now n`
 
-  
 # Load Required Modules
 - `module load ninja`
 - `module load miniconda`
@@ -26,6 +25,11 @@
 - Export the environment variable to make it easier:
 
   `export WRK_DIR=/projectnb/path/that/you/figure/out`
+
+# Re-run
+If it's not your first time running gaussian-splatting and **have** installed all packages, you can run the script `initialize_script.sh` by `. initialize_script.sh` to load modules and export WRK_DIR, then jump to submit jobs.
+
+Make sure you have set the script executable by `chmod +x initialize_script.sh` before running.
 
 ## Install Conda Packages
 ### Relocate Conda Directory
